@@ -273,6 +273,14 @@ If rtags or rdm aren't available, fail silently instead of throwing a breaking e
                                                               "-isystem/usr/local/include"]
                                                   :resourceDir (cdr (doom-call-process "clang" "-print-resource-dir"))))))))))))
 
+(setq lsp-clients-clangd-args '("-j=3"
+                                "--background-index"
+                                "--clang-tidy"
+                                "--completion-style=detailed"
+                                "--header-insertion=never"
+                                "--header-insertion-decorators=0"))
+(after! lsp-clangd (set-lsp-priority! 'clangd 2))
+
 (use-package! ccls
   :when (featurep! +lsp)
   :unless (featurep! :tools lsp +eglot)

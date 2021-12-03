@@ -12,14 +12,14 @@
 dashboard. These functions take no arguments and the dashboard buffer is current
 while they run.")
 
-(defvar +doom-dashboard-banner-file "default.png"
+(defvar +doom-dashboard-banner-file "default.jpg"
   "The path to the image file to be used in on the dashboard. The path is
 relative to `+doom-dashboard-banner-dir'. If nil, always use the ASCII banner.")
 
 (defvar +doom-dashboard-banner-dir (concat (dir!) "/banners/")
   "Where to look for `+doom-dashboard-banner-file'.")
 
-(defvar +doom-dashboard-ascii-banner-fn #'doom-dashboard-draw-ascii-banner-fn
+(defvar +doom-dashboard-ascii-banner-fn #'+fl/splashcii-banner
   "The function used to generate the ASCII banner on Doom's dashboard.")
 
 (defvar +doom-dashboard-banner-padding '(0 . 4)
@@ -389,39 +389,21 @@ What it is set to is controlled by `+doom-dashboard-pwd-policy'."
 
 ;;
 ;;; Widgets
+(defvar +fl/splashcii-query ""
+  "The query to search on asciiur.com")
 
-(defun doom-dashboard-draw-ascii-banner-fn ()
-  (let* ((banner
-          '("=================     ===============     ===============   ========  ========"
-            "\\\\ . . . . . . .\\\\   //. . . . . . .\\\\   //. . . . . . .\\\\  \\\\. . .\\\\// . . //"
-            "||. . ._____. . .|| ||. . ._____. . .|| ||. . ._____. . .|| || . . .\\/ . . .||"
-            "|| . .||   ||. . || || . .||   ||. . || || . .||   ||. . || ||. . . . . . . ||"
-            "||. . ||   || . .|| ||. . ||   || . .|| ||. . ||   || . .|| || . | . . . . .||"
-            "|| . .||   ||. _-|| ||-_ .||   ||. . || || . .||   ||. _-|| ||-_.|\\ . . . . ||"
-            "||. . ||   ||-'  || ||  `-||   || . .|| ||. . ||   ||-'  || ||  `|\\_ . .|. .||"
-            "|| . _||   ||    || ||    ||   ||_ . || || . _||   ||    || ||   |\\ `-_/| . ||"
-            "||_-' ||  .|/    || ||    \\|.  || `-_|| ||_-' ||  .|/    || ||   | \\  / |-_.||"
-            "||    ||_-'      || ||      `-_||    || ||    ||_-'      || ||   | \\  / |  `||"
-            "||    `'         || ||         `'    || ||    `'         || ||   | \\  / |   ||"
-            "||            .===' `===.         .==='.`===.         .===' /==. |  \\/  |   ||"
-            "||         .=='   \\_|-_ `===. .==='   _|_   `===. .===' _-|/   `==  \\/  |   ||"
-            "||      .=='    _-'    `-_  `='    _-'   `-_    `='  _-'   `-_  /|  \\/  |   ||"
-            "||   .=='    _-'          '-__\\._-'         '-_./__-'         `' |. /|  |   ||"
-            "||.=='    _-'                                                     `' |  /==.||"
-            "=='    _-'                         E M A C S                          \\/   `=="
-            "\\   _-'                                                                `-_   /"
-            " `''                                                                      ``'"))
-         (longest-line (apply #'max (mapcar #'length banner))))
-    (put-text-property
-     (point)
-     (dolist (line banner (point))
-       (insert (+doom-dashboard--center
-                +doom-dashboard--width
-                (concat
-                 line (make-string (max 0 (- longest-line (length line)))
-                                   32)))
-               "\n"))
-     'face 'doom-dashboard-banner)))
+(defun +fl/splashcii-banner ()
+  (mapc (lambda (line)
+          (insert (propertize (+doom-dashboard--center +doom-dashboard--width line)
+                              'face 'doom-dashboard-banner) " ")
+          (insert "\n"))
+        (split-string (with-output-to-string
+                        (call-process "splashcii" nil standard-output nil +fl/splashcii-query))
+                      "\n" t)))
+
+
+(setq +fl/splashcii-query "star")
+
 
 (defun doom-dashboard-widget-banner ()
   (let ((point (point)))
